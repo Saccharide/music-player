@@ -1,0 +1,11 @@
+#!/bin/sh
+
+playlist="playlist"
+
+if [ ! -f ./$playlist ]; then
+    echo "playlist is not found, please create one using:"
+    echo "find . -maxdepth 1 -name \"*.mp3\" -exec echo \"play\" {} \; > playlist && chmod +x playlist && sort -R playlist -o playlist"
+    exit 1
+fi
+sort -R playlist -o playlist
+nohup ./$playlist >/dev/null 2>&1 &

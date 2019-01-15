@@ -1,0 +1,4 @@
+#!/bin/sh
+
+kill $(ps -aux | grep -v grep | grep play | awk '{print $2;}')
+
