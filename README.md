@@ -7,7 +7,7 @@ A simple script that uses play command or SoX (Sound eXchange) to play mp3 files
 ```
 git clone https://github.com/saccharide/music-player && chmod +x install.sh && ./install.sh
 ```
-### Useage:
+### Usage:
 ```
 music
 ```
