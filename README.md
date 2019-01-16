@@ -5,7 +5,7 @@ A simple script that uses play command or SoX (Sound eXchange) to play mp3 files
 ### Installing
 
 ```
-git clone https://github.com/saccharide/music-player && chmod +x install.sh && ./install.sh
+git clone https://github.com/saccharide/music-player && chmod +x INSTALL && ./INSTALL
 ```
 ### Usage:
 ```

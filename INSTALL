@@ -4,4 +4,4 @@ homebin="$HOME/bin"
 if [ ! -d "$homebin" ]; then
     mkdir $homebin
 fi
-cp music quit next $HOME/bin
+cp music quit next current $HOME/bin
