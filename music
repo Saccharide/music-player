@@ -37,4 +37,10 @@ if [[ $playlist == "playlist" ]]; then
     playlist="./playlist"
 fi
 sort -R $playlist -o $playlist
+
+#while read -r line; do
+#  echo $line
+#  nohup $line >/dev/null 2>&1 &
+#  while kill -0 PIDS 2> /dev/null; do sleep 1; done;
+#done < $playlist
 nohup $playlist >/dev/null 2>&1 &

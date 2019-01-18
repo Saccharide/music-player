@@ -9,9 +9,26 @@ playlist_dir=$(dirname $(ps -aux | grep -v grep | grep -w play | awk '{print $12
 echo $playlist_dir
 if [[ $(current) == *"?"* ]]; then
     bad_current=$(current)
-    current_file=${bad_current%"?"}
-    echo $current_file
-else
-    current_number=$(grep -n $(current) $playlist_dir'/playlist' | cut -d ':' -f 1)
+    IFS='?'
+    read -ra current_file <<< "$bad_current"
+    count=0
+    recognized=0
+    for i in "${current_file[@]}"; do
+        if [[ -n $i ]]; then
+           recognized=$count
+        fi
+        ((count +=1))
+    done
+    char=${current_file[$recognized]}
+    current_number=$(grep -n $char $playlist_dir'/playlist' | cut -d ':' -f 1 | head -1)
     echo $current_number
+    command_to_add=$(sed -n $current_number'p' $playlist_dir'/playlist')
+    echo $command_to_add
+    sed "$current_number a $command_to_add" $playlist_dir'/playlist'
+
+else
+    current_number=$(grep -n $(current) $playlist_dir'/playlist' | cut -d ':' -f 1 | head -1)
+    command_to_add=$(sed -n $current_number'p' $playlist_dir'/playlist')
+    echo $command_to_add
+    sed "$current_number a $command_to_add" $playlist_dir'/playlist'
 fi
