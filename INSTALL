@@ -5,3 +5,4 @@ if [ ! -d "$homebin" ]; then
     mkdir $homebin
 fi
 cp `ls | grep -v "INSTALL" | grep -v "README.md"` $HOME/bin
+echo "export PATH=$HOME/bin:$PATH" >> ~/.bashrc
