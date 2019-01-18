@@ -3,9 +3,30 @@
 playlist="playlist"
 
 if [ ! -f ./$playlist ]; then
-    echo "playlist is not found, please create one using:"
-    echo "find . -maxdepth 1 -name \"*.mp3\" -exec echo \"play\" {} \; > playlist && chmod +x playlist && sort -R playlist -o playlist"
-    exit 1
+    echo "Playlist is not found in the current directory, please create one using:"
+    echo ""
+    echo "find `pwd` -maxdepth 1 -name \"*.mp3\" -exec echo \"play\" {} \; > playlist && chmod +x playlist && sort -R playlist -o playlist"
+    echo ""
+    echo "Or choose one from ~/Music: "
+    count=$(find ~/Music -type f -name "playlist" | wc -l)
+    if [ $count == 0 ]; then
+        echo "No playlist found in ~/Music"
+        exit 1
+    fi
+    count=$(($count + 1))
+    find ~/Music -type f -name "playlist" | xargs -n 1 | awk '{print NR "). " $1 }' | xargs -I location echo location
+    echo $count"). Quit"
+    read user_select 
+    if (( $user_select < $count )) && (( $user_select > 0 )); then
+        playlist=$(find ~/Music -type f -name "playlist" | sed -n $user_select"p")
+        echo "Playing from $(dirname $playlist) ..."
+    elif (( $user_select == $count )); then
+        echo "Quiting ..."
+        exit 1
+    else
+        echo -e "Invalid input... \nQuiting ..."
+        exit 1
+    fi
 fi
-sort -R playlist -o playlist
-nohup ./$playlist >/dev/null 2>&1 &
+sort -R $playlist -o $playlist
+nohup $playlist >/dev/null 2>&1 &

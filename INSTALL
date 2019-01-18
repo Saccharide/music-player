@@ -4,4 +4,4 @@ homebin="$HOME/bin"
 if [ ! -d "$homebin" ]; then
     mkdir $homebin
 fi
-cp * `ls -A | grep -v "INSTALL" | grep -v "README.md"` $HOME/bin
+cp `ls | grep -v "INSTALL" | grep -v "README.md"` $HOME/bin

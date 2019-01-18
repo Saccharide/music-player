@@ -4,6 +4,6 @@ if [[ -z $(ps -aux | grep -v grep | grep play) ]]; then
     echo "Music Player is not running."
     exit 1
 fi
-
+echo "Quiting ..."
 kill $(ps -aux | grep -v grep | grep play | awk '{print $2;}')
 
