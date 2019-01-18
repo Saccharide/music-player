@@ -10,7 +10,7 @@ playlist="playlist"
 if [ ! -f ./$playlist ]; then
     echo "Playlist is not found in the current directory, please create one using:"
     echo ""
-    echo "find `pwd` -maxdepth 1 -name \"*.mp3\" -exec echo \"play\" {} \; > playlist && chmod +x playlist && sort -R playlist -o playlist"
+    echo "find `pwd` -maxdepth 1 -name \"*.mp3\" -print0 | xargs -0 -I file echo play \'file\' > playlist && chmod +x playlist && sort -R playlist -o playlist"
     echo ""
     echo "Or choose one from ~/Music: "
     count=$(find ~/Music -type f -name "playlist" | wc -l)
@@ -32,6 +32,9 @@ if [ ! -f ./$playlist ]; then
         echo -e "Invalid input... \nQuiting ..."
         exit 1
     fi
+fi
+if [[ $playlist == "playlist" ]]; then
+    playlist="./playlist"
 fi
 sort -R $playlist -o $playlist
 nohup $playlist >/dev/null 2>&1 &
