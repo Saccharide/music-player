@@ -33,6 +33,8 @@ if [ ! -f ./$playlist ]; then
         exit 1
     fi
 fi
+
+# If the playlist is still a string, make it a command
 if [[ $playlist == "playlist" ]]; then
     playlist="./playlist"
 fi
@@ -43,4 +45,6 @@ sort -R $playlist -o $playlist
 #  nohup $line >/dev/null 2>&1 &
 #  while kill -0 PIDS 2> /dev/null; do sleep 1; done;
 #done < $playlist
+
+# Run the playlist in the background
 nohup $playlist >/dev/null 2>&1 &
