@@ -12,18 +12,29 @@ if [[ $(current) == *"?"* ]]; then
     IFS='?'
     read -ra current_file <<< "$bad_current"
     count=0
-    recognized=0
+    recognized=()
     for i in "${current_file[@]}"; do
         if [[ -n $i ]]; then
-           recognized=$count
+           recognized+=("$i")
         fi
         ((count +=1))
     done
-    char=${current_file[$recognized]}
-    current_file=$(grep -n $char $playlist_dir'/playlist' | cut -d ':' -f 1)
+
+    for i in "${recognized[@]}"; do
+        echo "item in recognized: $i"
+    done
+    
+    grepresult=$(cat $playlist_dir'/playlist')
+    for i in "${recognized[@]}"; do
+        grepresult=$(echo $grepresult | grep $i )
+    done
+   
+    real_current_file=$(echo $grepresult | rev | cut -d '/' -f 1 | rev | cut -d "'" -f 1)
+    current_file=$(grep -n $real_current_file $playlist_dir'/playlist') 
+#current_file=$(grep -Eown $pat $playlist_dir'/playlist' | cut -d ':' -f 1)
     echo "current file"
     echo $current_file
-    current_number=$(grep -n $char $playlist_dir'/playlist' | cut -d ':' -f 1 | head -1)
+    current_number=$(grep -n $real_current_file $playlist_dir'/playlist' | cut -d ':' -f 1 | head -1)
     echo "1 Current Number : "
     echo $current_number
     command_to_add=$(sed -n $current_number'p' $playlist_dir'/playlist')
@@ -36,7 +47,7 @@ if [[ $(current) == *"?"* ]]; then
 #nohup eval "$command_to_add" >/dev/null 2>&1 &
     eval "$command_to_add"
 #while kill -0 $(ps -aux | grep -v grep | grep -w play | awk '{print $2;}') 2> /dev/null; do sleep 1; done;
-    kill -CONT $(ps -aux | grep -v grep | grep play | awk '{print $2;}')
+    kill -CONT $(ps -aux | grep -v grep | grep -w play | awk '{print $2;}')
 
 else
     current_number=$(grep -n $(current) $playlist_dir'/playlist' | cut -d ':' -f 1 | head -1)
@@ -50,5 +61,5 @@ else
 #nohup eval "$command_to_add" >/dev/null 2>&1 &
     eval "$command_to_add"
 #while kill -0 $(ps -aux | grep -v grep | grep -w play | awk '{print $2;}') 2> /dev/null; do sleep 1; done;
-    kill -CONT $(ps -aux | grep -v grep | grep play | awk '{print $2;}')
+    kill -CONT $(ps -aux | grep -v grep | grep -w play | awk '{print $2;}')
 fi
