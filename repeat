@@ -1,65 +1,62 @@
 #!/bin/bash
 
+# Check if there is any current play process running
 if [[ -z $(ps -aux | grep -v grep | grep -w play) ]]; then
     echo "Music Player is not running."
     exit 1
 fi
 
+# Get the playlist directory name
 playlist_dir=$(dirname $(ps -aux | grep -v grep | grep -w play | awk '{print $12;}' | cut -d '.' -f 1))
-echo $playlist_dir
+
+# Check to see if there is any unreadable characters
 if [[ $(current) == *"?"* ]]; then
+
     bad_current=$(current)
     IFS='?'
     read -ra current_file <<< "$bad_current"
-    count=0
+    
+    # Create a list of recognizable characters
     recognized=()
     for i in "${current_file[@]}"; do
         if [[ -n $i ]]; then
            recognized+=("$i")
         fi
-        ((count +=1))
     done
-
-    for i in "${recognized[@]}"; do
-        echo "item in recognized: $i"
-    done
-    
+   
+    # grep all the recognizable characters, only one file should contains all of them
     grepresult=$(cat $playlist_dir'/playlist')
     for i in "${recognized[@]}"; do
         grepresult=$(echo $grepresult | grep $i )
     done
    
+    # Find the full file name of the current song
     real_current_file=$(echo $grepresult | rev | cut -d '/' -f 1 | rev | cut -d "'" -f 1)
-    current_file=$(grep -n $real_current_file $playlist_dir'/playlist') 
-#current_file=$(grep -Eown $pat $playlist_dir'/playlist' | cut -d ':' -f 1)
-    echo "current file"
-    echo $current_file
-    current_number=$(grep -n $real_current_file $playlist_dir'/playlist' | cut -d ':' -f 1 | head -1)
-    echo "1 Current Number : "
-    echo $current_number
-    command_to_add=$(sed -n $current_number'p' $playlist_dir'/playlist')
-    echo "1 Command to add : "
-    echo $command_to_add
-    #sed "$current_number a $command_to_add" $playlist_dir'/playlist'
 
+    # Gets the line number of this song, and adds to the playlist
+    current_number=$(grep -n $real_current_file $playlist_dir'/playlist' | cut -d ':' -f 1 | head -1)
+
+    # Gets the current song based on the line number, -n: quiet 
+    command_to_add=$(sed -n $current_number'p' $playlist_dir'/playlist')
+
+    # Stops the current songs
     current_PID=$(ps -aux | grep -v grep | grep -w play | awk '{print $2;}')
     kill -STOP $current_PID
-#nohup eval "$command_to_add" >/dev/null 2>&1 &
+
+    # Plays the current song
     eval "$command_to_add"
-#while kill -0 $(ps -aux | grep -v grep | grep -w play | awk '{print $2;}') 2> /dev/null; do sleep 1; done;
+
+    # Resume the current song
     kill -CONT $(ps -aux | grep -v grep | grep -w play | awk '{print $2;}')
 
 else
+
+    # Similar idea to above
     current_number=$(grep -n $(current) $playlist_dir'/playlist' | cut -d ':' -f 1 | head -1)
     command_to_add=$(sed -n $current_number'p' $playlist_dir'/playlist')
-    echo "2 Command to add : "
-    echo $command_to_add
-    #sed "$current_number a $command_to_add" $playlist_dir'/playlist'
 
     current_PID=$(ps -aux | grep -v grep | grep -w play | awk '{print $2;}')
     kill -STOP $current_PID
-#nohup eval "$command_to_add" >/dev/null 2>&1 &
     eval "$command_to_add"
-#while kill -0 $(ps -aux | grep -v grep | grep -w play | awk '{print $2;}') 2> /dev/null; do sleep 1; done;
     kill -CONT $(ps -aux | grep -v grep | grep -w play | awk '{print $2;}')
 fi
