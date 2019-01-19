@@ -5,5 +5,5 @@ if [[ -z $(ps -aux | grep -v grep | grep play) ]]; then
     exit 1
 fi
 echo "Quiting ..."
-kill $(ps -aux | grep -v grep | grep play | awk '{print $2;}')
+kill -9 $(ps -aux | grep -v grep | grep play | awk '{print $2;}')
 
