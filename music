@@ -5,6 +5,12 @@
 ##### Author: Saccharide            #####
 #########################################
 
+# Check if music player is already running
+if [[ -n $(ps -aux | grep -v grep | grep play) ]]; then
+    echo "Music Player is already running."
+    exit 1
+fi
+
 playlist="playlist"
 
 if [ ! -f ./$playlist ]; then
@@ -13,21 +19,46 @@ if [ ! -f ./$playlist ]; then
     echo "find `pwd` -maxdepth 1 -name \"*.mp3\" -print0 | xargs -0 -I file echo play \'file\' > playlist && chmod +x playlist && sort -R playlist -o playlist"
     echo ""
     echo "Or choose one from ~/Music: "
+
+    # Trying to count number of playlist in ~/Music
     count=$(find ~/Music -type f -name "playlist" | wc -l)
     if [ $count == 0 ]; then
         echo "No playlist found in ~/Music"
         exit 1
     fi
     count=$(($count + 1))
+
+    # Trying to find playlist in ~/Music and display it to user
     find ~/Music -type f -name "playlist" | xargs -n 1 | awk '{print NR "). " $1 }' | xargs -I location echo location
+
+    # Adding the option to auto generate the script
+    echo $count"). Automatic generate playlist in the current directory."
+    echo ""
+    count=$(($count + 1))
     echo $count"). Quit"
+
+    # Read user input
     read user_select 
-    if (( $user_select < $count )) && (( $user_select > 0 )); then
+
+    # If user select a playlist directory 
+    if (( $user_select < $count-1 )) && (( $user_select > 0 )); then
         playlist=$(find ~/Music -type f -name "playlist" | sed -n $user_select"p")
         echo "Playing from $(dirname $playlist) ..."
+
+    # If user choose to run the code to generate playlist
+    elif (( $user_select == $count-1 )); then
+        echo "Generating playlist ..."
+        find `pwd` -maxdepth 1 -name "*.mp3" -print0 | xargs -0 -I file echo play \'file\' > playlist && chmod +x playlist && sort -R playlist -o playlist
+        echo "Complete."
+        echo "Run the music player with: music"
+        exit 1
+
+    # If user select to quit 
     elif (( $user_select == $count )); then
         echo "Quiting ..."
         exit 1
+
+    # All other bad input
     else
         echo -e "Invalid input... \nQuiting ..."
         exit 1
