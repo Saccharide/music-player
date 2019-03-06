@@ -6,7 +6,7 @@
 #########################################
 
 # Check if music player is already running
-if [[ -n $(ps -aux | grep -v grep | grep play) ]]; then
+if [[ -n $(ps -aux | grep -v grep | grep -v display | grep play) ]]; then
     echo "Music Player is already running."
     exit 1
 fi

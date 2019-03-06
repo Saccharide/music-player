@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [[ -z $(ps -aux | grep -v grep | grep play) ]]; then
+if [[ -z $(ps -aux | grep -v grep | grep -v display | grep play) ]]; then
     echo "Music Player is not running."
     exit 1
 fi
