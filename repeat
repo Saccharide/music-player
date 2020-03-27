@@ -43,8 +43,9 @@ if [[ $(current) == *"?"* ]]; then
     current_PID=$(ps -aux | grep -v grep | grep -w play | awk '{print $2;}')
     kill -STOP $current_PID
 
+    echo "inside if"
     # Plays the current song
-    eval "$command_to_add"
+    eval "$command_to_add" &>/dev/null &
 
     # Resume the current song
     kill -CONT $(ps -aux | grep -v grep | grep -w play | awk '{print $2;}')
@@ -52,11 +53,20 @@ if [[ $(current) == *"?"* ]]; then
 else
 
     # Similar idea to above
-    current_number=$(grep -n $(current) $playlist_dir'/playlist' | cut -d ':' -f 1 | head -1)
+    echo "current = $(current)"
+    current_number=$(grep -n "$(current)" $playlist_dir'/playlist' | cut -d ':' -f 1 | head -1)
+    echo "current number  = $current_number"
     command_to_add=$(sed -n $current_number'p' $playlist_dir'/playlist')
 
+    echo "command to add: $command_to_add"
     current_PID=$(ps -aux | grep -v grep | grep -w play | awk '{print $2;}')
+    echo "current PID number  = $current_PID"
+    echo "current $(ps -aux | grep -v grep | grep -w play)"
+
     kill -STOP $current_PID
-    eval "$command_to_add"
+    echo "inside else"
+    eval "$command_to_add" &>/dev/null
+    #nohub $(eval "$command_to_add" &>/dev/null) &
     kill -CONT $(ps -aux | grep -v grep | grep -w play | awk '{print $2;}')
+    #kill -CONT $current_PID
 fi
